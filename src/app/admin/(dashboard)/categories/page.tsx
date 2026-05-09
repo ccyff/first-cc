@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { createCategory, deleteCategory } from "../actions";
 
-export default async function AdminCategoriesPage() {
+export default async function AdminCategoriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ e?: string }>;
+}) {
+  const sp = await searchParams;
+  const showErr = sp.e === "1";
+
   const categories = await prisma.category.findMany({
     orderBy: { sortOrder: "asc" },
   });
@@ -10,6 +17,12 @@ export default async function AdminCategoriesPage() {
     <div>
       <h1 className="text-2xl font-semibold text-zinc-900">分类</h1>
       <p className="mt-1 text-sm text-zinc-500">用于前台筛选与后台归类。</p>
+
+      {showErr ? (
+        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          操作未成功，请检查必填项或 slug 是否重复。
+        </p>
+      ) : null}
 
       <form action={createCategory} className="mt-8 grid max-w-xl gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
         <p className="text-sm font-medium text-zinc-800">新建分类</p>

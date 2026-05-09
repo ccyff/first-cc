@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { stringifyTags } from "@/lib/tags";
 
@@ -17,17 +18,17 @@ export async function createCategory(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   let slug = String(formData.get("slug") ?? "").trim();
   const sortOrder = Number(formData.get("sortOrder") ?? 0) || 0;
-  if (!name) return { error: "名称必填" };
+  if (!name) redirect("/admin/categories?e=1");
   if (!slug) slug = slugify(name);
-  if (!slug) return { error: "请填写有效 slug" };
+  if (!slug) redirect("/admin/categories?e=1");
   try {
     await prisma.category.create({ data: { name, slug, sortOrder } });
   } catch {
-    return { error: "分类创建失败（slug 可能重复）" };
+    redirect("/admin/categories?e=1");
   }
   revalidatePath("/");
   revalidatePath("/admin/categories");
-  return { ok: true };
+  redirect("/admin/categories");
 }
 
 export async function deleteCategory(id: string) {
@@ -46,9 +47,9 @@ export async function createTool(formData: FormData) {
   const tagsRaw = String(formData.get("tags") ?? "");
   const featured = formData.get("featured") === "on";
   const sortOrder = Number(formData.get("sortOrder") ?? 0) || 0;
-  if (!name || !description || !url) return { error: "名称、描述、链接必填" };
+  if (!name || !description || !url) redirect("/admin/tools?e=1");
   if (!slug) slug = slugify(name);
-  if (!slug) return { error: "请填写有效 slug" };
+  if (!slug) redirect("/admin/tools?e=1");
   try {
     await prisma.aiTool.create({
       data: {
@@ -64,11 +65,11 @@ export async function createTool(formData: FormData) {
       },
     });
   } catch {
-    return { error: "创建失败（slug 可能重复）" };
+    redirect("/admin/tools?e=1");
   }
   revalidatePath("/");
   revalidatePath("/admin/tools");
-  return { ok: true };
+  redirect("/admin/tools");
 }
 
 export async function updateTool(id: string, formData: FormData) {
@@ -81,7 +82,7 @@ export async function updateTool(id: string, formData: FormData) {
   const tagsRaw = String(formData.get("tags") ?? "");
   const featured = formData.get("featured") === "on";
   const sortOrder = Number(formData.get("sortOrder") ?? 0) || 0;
-  if (!name || !description || !url) return { error: "名称、描述、链接必填" };
+  if (!name || !description || !url) redirect(`/admin/tools?edit=${id}&e=1`);
   if (!slug) slug = slugify(name);
   try {
     await prisma.aiTool.update({
@@ -99,11 +100,11 @@ export async function updateTool(id: string, formData: FormData) {
       },
     });
   } catch {
-    return { error: "更新失败" };
+    redirect(`/admin/tools?edit=${id}&e=1`);
   }
   revalidatePath("/");
   revalidatePath("/admin/tools");
-  return { ok: true };
+  redirect("/admin/tools");
 }
 
 export async function deleteTool(id: string) {
@@ -119,7 +120,7 @@ export async function createNews(formData: FormData) {
   const content = String(formData.get("content") ?? "").trim();
   const sourceUrl = String(formData.get("sourceUrl") ?? "").trim() || null;
   const published = formData.get("published") === "on";
-  if (!title || !summary || !content) return { error: "标题、摘要、正文必填" };
+  if (!title || !summary || !content) redirect("/admin/news?e=1");
   if (!slug) slug = slugify(title);
   try {
     await prisma.newsArticle.create({
@@ -133,11 +134,11 @@ export async function createNews(formData: FormData) {
       },
     });
   } catch {
-    return { error: "创建失败（slug 可能重复）" };
+    redirect("/admin/news?e=1");
   }
   revalidatePath("/news");
   revalidatePath("/admin/news");
-  return { ok: true };
+  redirect("/admin/news");
 }
 
 export async function updateNews(id: string, formData: FormData) {
@@ -147,7 +148,7 @@ export async function updateNews(id: string, formData: FormData) {
   const content = String(formData.get("content") ?? "").trim();
   const sourceUrl = String(formData.get("sourceUrl") ?? "").trim() || null;
   const published = formData.get("published") === "on";
-  if (!title || !summary || !content) return { error: "标题、摘要、正文必填" };
+  if (!title || !summary || !content) redirect(`/admin/news?edit=${id}&e=1`);
   if (!slug) slug = slugify(title);
   try {
     await prisma.newsArticle.update({
@@ -155,11 +156,11 @@ export async function updateNews(id: string, formData: FormData) {
       data: { title, slug, summary, content, sourceUrl, published },
     });
   } catch {
-    return { error: "更新失败" };
+    redirect(`/admin/news?edit=${id}&e=1`);
   }
   revalidatePath("/news");
   revalidatePath("/admin/news");
-  return { ok: true };
+  redirect("/admin/news");
 }
 
 export async function deleteNews(id: string) {

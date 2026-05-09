@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { PublicNav } from "@/components/PublicNav";
+import {
+  defaultDescription,
+  getMetadataBase,
+  seoKeywords,
+} from "@/lib/site";
 
 const space = Space_Grotesk({
   variable: "--font-space",
@@ -13,10 +18,50 @@ const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+const siteTitleDefault =
+  "AI应用导航_AI编程工具_AI最新资讯大全 | AI Nexus";
+
 export const metadata: Metadata = {
-  title: "AI Nexus — AI 产品与资讯导航",
-  description:
-    "聚合主流 AI 工具、模型与行业资讯的导航站，支持后台维护与分类筛选。",
+  metadataBase: getMetadataBase(),
+  title: {
+    default: siteTitleDefault,
+    template: "%s | AI Nexus",
+  },
+  description: defaultDescription,
+  keywords: [...seoKeywords],
+  authors: [{ name: "AI Nexus", url: "/" }],
+  creator: "AI Nexus",
+  publisher: "AI Nexus",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "zh_CN",
+    siteName: "AI Nexus",
+    title: siteTitleDefault,
+    description: defaultDescription,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitleDefault,
+    description: defaultDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  category: "technology",
 };
 
 export default function RootLayout({

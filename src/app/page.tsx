@@ -1,6 +1,37 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { parseTagsJson } from "@/lib/tags";
+import { defaultDescription, seoKeywords } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: {
+    absolute:
+      "AI应用导航_AI编程工具_AI最新资讯大全 | AI Nexus — 人工智能工具与行业动态",
+  },
+  description: defaultDescription,
+  keywords: [
+    ...seoKeywords,
+    "AI导航",
+    "人工智能工具推荐",
+    "AI开发工具",
+    "文生图",
+    "代码生成",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    title:
+      "AI应用导航_AI编程工具_AI最新资讯大全 | AI Nexus — 人工智能工具与行业动态",
+    description: defaultDescription,
+    url: "/",
+    type: "website",
+  },
+  twitter: {
+    title:
+      "AI应用导航_AI编程工具_AI最新资讯大全 | AI Nexus — 人工智能工具与行业动态",
+    description: defaultDescription,
+  },
+};
 
 export default async function Home({
   searchParams,
@@ -34,7 +65,7 @@ export default async function Home({
     prisma.newsArticle.findMany({
       where: { published: true },
       orderBy: { publishedAt: "desc" },
-      take: 5,
+      take: 8,
     }),
   ]);
 
@@ -53,7 +84,7 @@ export default async function Home({
           发现下一代 AI 工具与资讯
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/65 sm:text-base">
-          精选对话、编程、图像、语音、搜索与智能体等方向的主流产品。数据由后台维护，可按分类浏览或通过搜索快速定位。
+          覆盖对话助手、写作、编程 IDE、低代码原型、图像视频、语音、研究搜索、自动化智能体与本地/云端模型基础设施等方向。条目与长文由后台持续维护，支持分类筛选、关键词搜索与外链跳转；页面底部资讯区可直达深度导读。
         </p>
         <form
           className="mt-8 flex max-w-xl flex-col gap-3 sm:flex-row"

@@ -105,9 +105,10 @@ function ToolFields({
 export default async function AdminToolsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ edit?: string }>;
+  searchParams: Promise<{ edit?: string; e?: string }>;
 }) {
-  const { edit } = await searchParams;
+  const { edit, e } = await searchParams;
+  const showErr = e === "1";
   const [tools, categories, editing] = await Promise.all([
     prisma.aiTool.findMany({
       orderBy: [{ featured: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
@@ -133,6 +134,12 @@ export default async function AdminToolsPage({
     <div>
       <h1 className="text-2xl font-semibold text-zinc-900">AI 产品</h1>
       <p className="mt-1 text-sm text-zinc-500">维护导航站中的产品与外链。</p>
+
+      {showErr ? (
+        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          操作未成功，请检查必填项或 slug 是否重复。
+        </p>
+      ) : null}
 
       {editing ? (
         <div className="mt-8 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">

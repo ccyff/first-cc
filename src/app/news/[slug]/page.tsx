@@ -1,6 +1,56 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { seoKeywords } from "@/lib/site";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await prisma.newsArticle.findFirst({
+    where: { slug, published: true },
+    select: {
+      title: true,
+      summary: true,
+      publishedAt: true,
+    },
+  });
+  if (!article) {
+    return { title: "未找到资讯" };
+  }
+  const description =
+    article.summary.length > 160
+      ? `${article.summary.slice(0, 157)}…`
+      : article.summary;
+  const urlPath = `/news/${slug}`;
+  return {
+    title: `${article.title}_AI资讯`,
+    description,
+    keywords: [
+      ...seoKeywords,
+      "AI深度",
+      article.title,
+      "人工智能解读",
+    ],
+    alternates: { canonical: urlPath },
+    openGraph: {
+      type: "article",
+      title: `${article.title} | AI Nexus`,
+      description,
+      url: urlPath,
+      publishedTime: article.publishedAt.toISOString(),
+      locale: "zh_CN",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${article.title} | AI Nexus`,
+      description,
+    },
+  };
+}
 
 export default async function NewsDetailPage({
   params,

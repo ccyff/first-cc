@@ -5,9 +5,10 @@ import { createNews, deleteNews, updateNews } from "../actions";
 export default async function AdminNewsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ edit?: string }>;
+  searchParams: Promise<{ edit?: string; e?: string }>;
 }) {
-  const { edit } = await searchParams;
+  const { edit, e } = await searchParams;
+  const showErr = e === "1";
   const [articles, editing] = await Promise.all([
     prisma.newsArticle.findMany({
       orderBy: { publishedAt: "desc" },
@@ -19,6 +20,12 @@ export default async function AdminNewsPage({
     <div>
       <h1 className="text-2xl font-semibold text-zinc-900">资讯</h1>
       <p className="mt-1 text-sm text-zinc-500">前台资讯列表与详情正文。</p>
+
+      {showErr ? (
+        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          操作未成功，请检查必填项或 slug 是否重复。
+        </p>
+      ) : null}
 
       {editing ? (
         <div className="mt-8 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
